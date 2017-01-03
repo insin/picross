@@ -1,0 +1,30 @@
+table {
+  border-spacing: none;
+  border-collapse: collapse;
+}
+
+.ColClues {
+  vertical-align: bottom;
+  text-align: center;
+}
+.RowClues {
+  text-align: right;
+}
+.highlight {
+  background-color: lightgreen;
+}
+
+.Block {
+  width: 16px;
+  height: 16px;
+  border: 1px solid #000;
+}
+.etched {
+  background-color: black;
+}
+.marked {
+  background-color: gray;
+}
+.selected {
+  background-color: lightgreen;
+}
