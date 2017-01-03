@@ -101,9 +101,10 @@ let Puzzle = React.createClass({
   componentWillUnmount() {
     this.stopTimer()
   },
+
   startTimer () {
     if (!this.timerInterval) {
-      this.timerInterval = window.setInterval(this.handleTick, 1000)
+      this.timerInterval = window.setInterval(this.tick, 1000)
     }
   },
   stopTimer() {
@@ -112,7 +113,7 @@ let Puzzle = React.createClass({
       this.timerInterval = null
     }
   },
-  handleTick() {
+  tick() {
     this.setState(({time}) => {
       let nextTime = Math.max(0, time - 1)
       if (nextTime === 0) {
@@ -124,71 +125,127 @@ let Puzzle = React.createClass({
       }
     })
   },
-  handleKeyDown(e) {
-    if (this.state.completed || this.state.failed) return
 
-    if (e.key === 'ArrowRight' && this.state.x < this.width - 1) {
-      this.setState({x: this.state.x + 1})
-      e.preventDefault()
+  /**
+   * Create a state change object for an etch at the given coords.
+   */
+  _etch(x, y) {
+    let coord = `${y}x${x}`
+    // Successful un-etch (why?)
+    if (this.state.etched[coord]) {
+      return {etched: {...this.state.etched, [coord]: false}}
     }
-    if (e.key === 'ArrowLeft' && this.state.x > 0) {
-      this.setState({x: this.state.x - 1})
-      e.preventDefault()
-    }
-    if (e.key === 'ArrowDown' && this.state.y < this.height - 1) {
-      this.setState({y: this.state.y + 1})
-      e.preventDefault()
-    }
-    if (e.key === 'ArrowUp' && this.state.y > 0) {
-      this.setState({y: this.state.y - 1})
-      e.preventDefault()
-    }
-    if (e.key === 'Control') {
-      let coord = `${this.state.y}x${this.state.x}`
-      // Successful un-etch (why?)
-      if (this.state.etched[coord]) {
-        this.setState({etched: {...this.state.etched, [coord]: false}})
+    // Successful etch
+    else if (this.solution[coord]) {
+      let etched = {...this.state.etched, [coord]: true}
+      let completed = checkCompletion(etched, this.solution)
+      if (completed) {
+        this.stopTimer()
       }
-      // Successful etch
-      else if (this.solution[coord]) {
-        let etched = {...this.state.etched, [coord]: true}
-        let completed = checkCompletion(etched, this.solution)
-        if (completed) {
-          this.stopTimer()
-        }
-        this.setState({etched, completed})
+      return {
+        etched,
+        completed,
+        marked: {...this.state.marked, [coord]: false}
       }
-      // Unsuccessful etch
-      else {
-        this.setState(({marked, penalty, time}) => ({
-          marked: {...marked, [coord]: true},
-          penalty: penalty * 2,
-          time: Math.max(0, time - penalty),
-        }))
-      }
-      e.preventDefault()
     }
-    if (e.key === 'Shift') {
-      let coord = `${this.state.y}x${this.state.x}`
-      // Un-mark
-      if (this.state.marked[coord]) {
-        this.setState({marked: {...this.state.marked, [coord]: false}})
-      }
-      // Mark
-      else {
-        this.setState({marked: {...this.state.marked, [coord]: true}})
+    // Unsuccessful etch
+    else {
+      return {
+        marked: {...this.state.marked, [coord]: true},
+        penalty: this.state.penalty * 2,
+        time: Math.max(0, this.state.time - this.state.penalty),
       }
     }
   },
+  /**
+   * Create a state change object for a mark at the given coords.
+   */
+  _mark(x, y) {
+    let coord = `${y}x${x}`
+    // Un-mark
+    if (this.state.marked[coord]) {
+      return {marked: {...this.state.marked, [coord]: false}}
+    }
+    // Mark
+    else if (!this.state.etched[coord]) {
+      return {marked: {...this.state.marked, [coord]: true}}
+    }
+  },
+  /**
+   * Perform a move, also performing an etch or mark if the appopriate button is
+   * held down.
+   */
+  _move(x, y) {
+    this.setState({
+      x,
+      y,
+      ...this.ctrlDown ? this._etch(x, y) : null,
+      ...!this.ctrlDown && this.shiftDown ? this._mark(x, y) : null,
+    })
+  },
+
+  handleKeyDown(e) {
+    if (this.state.completed || this.state.failed) return
+
+    if (e.key === 'ArrowRight') {
+      if (this.state.x < this.width - 1) {
+        this._move(this.state.x + 1, this.state.y)
+      }
+      e.preventDefault()
+    }
+    else if (e.key === 'ArrowLeft') {
+      if (this.state.x > 0) {
+        this._move(this.state.x - 1, this.state.y)
+      }
+      e.preventDefault()
+    }
+    else if (e.key === 'ArrowDown') {
+      if (this.state.y < this.height - 1) {
+        this._move(this.state.x, this.state.y + 1)
+      }
+      e.preventDefault()
+    }
+    else if (e.key === 'ArrowUp') {
+      if (this.state.y > 0) {
+        this._move(this.state.x, this.state.y - 1)
+      }
+      e.preventDefault()
+    }
+    else if (e.key === 'Control') {
+      if (!this.ctrlDown) {
+        this.setState(this._etch(this.state.x, this.state.y))
+        this.ctrlDown = true
+      }
+      e.preventDefault()
+    }
+    else if (e.key === 'Shift') {
+      if (!this.shiftDown) {
+        this.setState(this._mark(this.state.x, this.state.y))
+        this.shiftDown = true
+      }
+      e.preventDefault()
+    }
+  },
+  handleKeyUp(e) {
+    if (e.key === 'Control') {
+      this.ctrlDown = false
+      e.preventDefault()
+    }
+    if (e.key === 'Shift') {
+      this.shiftDown = false
+      e.preventDefault()
+    }
+  },
+
   render() {
     let {name} = this.props
     let {completed, failed, etched, marked, time, x, y} = this.state
     let currentCoord = `${y}x${x}`
-    return <div className="Puzzle" onKeyDown={this.handleKeyDown} tabIndex={0}>
+    return <div className="Puzzle" onKeyDown={this.handleKeyDown} onKeyUp={this.handleKeyUp} tabIndex={0}>
       <table>
         <tbody>
           <tr>
-            <td>
+            <td style={{textAlign: 'center'}}>
               {name}<br/>{formatTime(time)}
             </td>
             {this.colClues.map((clues, col) => {
@@ -222,7 +279,9 @@ let Puzzle = React.createClass({
                 if (currentCoord === blockCoord) {
                   className += ' selected'
                 }
-                return <td className={className} key={blockCoord}/>
+                return <td className={className} key={blockCoord}>
+                  {marked[blockCoord] ? 'x' : <span>&nbsp;</span>}
+                </td>
               })}
             </tr>
           })}
