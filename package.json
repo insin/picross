@@ -4,7 +4,7 @@
   "description": "",
   "private": true,
   "scripts": {
-    "build": "nwb build-react-app",
+    "build": "nwb build-react-app --no-vendor",
     "clean": "nwb clean-app",
     "start": "nwb serve-react-app",
     "test": "nwb test-react",
@@ -22,5 +22,5 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/insin/react-no-super-picross.git"
+    "url": "https://github.com/insin/picross.git"
   }}
