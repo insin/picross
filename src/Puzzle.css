@@ -70,8 +70,23 @@ table {
   color: #333;
 }
 .selected {
-  border:  1px solid red;
+  border: 1px solid red;
   position: relative;
+  animation-direction: alternate;
+  animation-duration: 1s;
+  animation-iteration-count: infinite;
+  animation-name: border-pulse;
+}
+@keyframes border-pulse {
+  from {
+    border-color: #f22;
+  }
+  50% {
+    border-color: #f00;
+  }
+  to {
+    border-color: #c00;
+  }
 }
 .selected::before {
   width: 18px;
