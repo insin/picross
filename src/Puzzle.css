@@ -98,50 +98,41 @@ table {
   z-index: 10;
 }
 .marking::before {
+  bottom: 8px;
+  left: 8px;
   animation-name: draw-x;
-  animation-duration: .32s;
+  animation-duration: .24s;
 }
 @keyframes draw-x {
   from {
-    bottom: 8px;
-    left: 8px;
-  }
-  15% {
-    bottom: 12px;
-    left: 12px;
+    transform: translateX(4px) translateY(-4px);
   }
   50% {
-    bottom: 4px;
-    left: 4px;
+    transform: translateX(-2px) translateY(4px);
   }
-  65% {
-    bottom: 12px;
+  51% {
+    transform: translateX(-2px) translateY(-4px);
   }
   to {
-    bottom: 4px;
-    left: 12px;
+    transform: translateX(4px) translateY(4px);
   }
 }
 .cleaning::before {
   content: url('./hand.png');
   bottom: 2px;
   left: 2px;
-  animation-duration: .16s;
+  animation-duration: .12s;
   animation-name: hand-wipe;
 }
 @keyframes hand-wipe {
   from {
-    bottom: 2px;
-    left: 2px;
-    transform: rotate(0);
+    transform: translateX(0) rotate(0);
   }
   50% {
-    left: 24px;
-    transform: rotate(45deg);
+    transform: translateX(22px) rotate(45deg);
   }
   to {
-    left: -24px;
-    transform: rotate(-5deg);
+    transform: translateX(-24px) rotate(-5deg);
   }
 }
 .etching::after {
@@ -157,13 +148,9 @@ table {
 }
 @keyframes hammer-hit {
   from {
-    bottom: 32px;
-    left: 48px;
-    transform: rotate(0);
+    transform: translateX(0) translateY(0) rotate(0);
   }
   to {
-    bottom: 14px;
-    left: 18px;
-    transform: rotate(-45deg);
+    transform: translateX(-31px) translateY(19px) rotate(-45deg);
   }
 }
