@@ -284,6 +284,9 @@ let Puzzle = React.createClass({
     else if (this.action === 'etch') {
       return 'etching'
     }
+    else if (this.action === 'mark') {
+      return 'marking'
+    }
   },
   render() {
     let {name} = this.props

@@ -58,6 +58,7 @@ table {
   border-color: darkslategrey;
 }
 .marked {
+  color: #333;
 }
 .selected {
   border:  1px solid red;
@@ -68,14 +69,56 @@ table {
   height: 18px;
   content: url('./chisel.png');
   position: absolute;
-  bottom: 8px;
-  left: 8px;
+  bottom: 10px;
+  left: 10px;
   z-index: 10;
+}
+.marking::before {
+  animation-name: draw-x;
+  animation-duration: .32s;
+}
+@keyframes draw-x {
+  from {
+    bottom: 8px;
+    left: 8px;
+  }
+  15% {
+    bottom: 12px;
+    left: 12px;
+  }
+  50% {
+    bottom: 4px;
+    left: 4px;
+  }
+  65% {
+    bottom: 12px;
+  }
+  to {
+    bottom: 4px;
+    left: 12px;
+  }
 }
 .cleaning::before {
   content: url('./hand.png');
   bottom: 2px;
   left: 2px;
+  animation-duration: .16s;
+  animation-name: hand-wipe;
+}
+@keyframes hand-wipe {
+  from {
+    bottom: 2px;
+    left: 2px;
+    transform: rotate(0);
+  }
+  50% {
+    left: 24px;
+    transform: rotate(45deg);
+  }
+  to {
+    left: -24px;
+    transform: rotate(-5deg);
+  }
 }
 .etching::after {
   width: 18px;
@@ -84,5 +127,19 @@ table {
   position: absolute;
   bottom: 32px;
   left: 48px;
-  z-index: 10;
+  z-index: 20;
+  animation-duration: .12s;
+  animation-name: hammer-hit;
+}
+@keyframes hammer-hit {
+  from {
+    bottom: 32px;
+    left: 48px;
+    transform: rotate(0);
+  }
+  to {
+    bottom: 14px;
+    left: 18px;
+    transform: rotate(-45deg);
+  }
 }
