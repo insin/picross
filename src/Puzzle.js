@@ -327,7 +327,7 @@ let Puzzle = React.createClass({
                 else if (marked[blockCoord]) {
                   className += ' marked'
                 }
-                if (currentCoord === blockCoord) {
+                if (!completed && !failed && currentCoord === blockCoord) {
                   className += ' selected ' + this.getCursorClass()
                 }
                 return <td className={className} key={blockCoord}>
