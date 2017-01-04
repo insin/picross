@@ -79,8 +79,8 @@ let Puzzle = React.createClass({
       marked: {},
       // Time remaining (in seconds) to complete the puzzle
       time: 30 * 60,
-      // Penalty (in seconds) for attempting an incorrect etch
-      penalty: 60,
+      // Penalty (in minutes) for attempting an incorrect etch
+      penalty: 2,
       // Current X coord
       x: 0,
       // Current Y coord
@@ -152,8 +152,8 @@ let Puzzle = React.createClass({
     else {
       return {
         marked: {...this.state.marked, [coord]: true},
-        penalty: this.state.penalty * 2,
-        time: Math.max(0, this.state.time - this.state.penalty),
+        penalty: Math.min(8, this.state.penalty * 2),
+        time: Math.max(0, this.state.time - (this.state.penalty * 60)),
       }
     }
   },
