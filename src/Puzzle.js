@@ -127,13 +127,27 @@ let Puzzle = React.createClass({
   },
 
   /**
-   * Create a state change object for an etch at the given coords.
+   * Create a state change object for cleaning the given coord if it's etched or
+   * marked.
    */
-  _etch(x, y) {
-    let coord = `${y}x${x}`
-    // Successful un-etch (why?)
+  _clean(coord) {
     if (this.state.etched[coord]) {
       return {etched: {...this.state.etched, [coord]: false}}
+    }
+    if (this.state.marked[coord]) {
+      return {marked: {...this.state.marked, [coord]: false}}
+    }
+  },
+  /**
+   * Create a state change object for an etch at the given coords.
+   */
+  _etch(coord) {
+    // Successful un-etch (why?)
+    if (this.state.etched[coord]) {
+      return {
+        etched: {...this.state.etched, [coord]: false},
+        action: 'clean'
+      }
     }
     // Successful etch
     else if (this.solution[coord]) {
@@ -145,7 +159,8 @@ let Puzzle = React.createClass({
       return {
         etched,
         completed,
-        marked: {...this.state.marked, [coord]: false}
+        marked: {...this.state.marked, [coord]: false},
+        action: 'etch',
       }
     }
     // Unsuccessful etch
@@ -154,34 +169,53 @@ let Puzzle = React.createClass({
         marked: {...this.state.marked, [coord]: true},
         penalty: Math.min(8, this.state.penalty * 2),
         time: Math.max(0, this.state.time - (this.state.penalty * 60)),
+        action: 'etch',
       }
     }
   },
   /**
    * Create a state change object for a mark at the given coords.
    */
-  _mark(x, y) {
-    let coord = `${y}x${x}`
+  _mark(coord) {
     // Un-mark
     if (this.state.marked[coord]) {
-      return {marked: {...this.state.marked, [coord]: false}}
+      return {
+        marked: {...this.state.marked, [coord]: false},
+        action: 'clean',
+      }
     }
     // Mark
-    else if (!this.state.etched[coord]) {
-      return {marked: {...this.state.marked, [coord]: true}}
+    else {
+      return {
+        marked: {...this.state.marked, [coord]: true},
+        etched: {...this.state.etched, [coord]: false},
+        action: 'mark',
+      }
     }
   },
   /**
-   * Perform a move, also performing an etch or mark if the appopriate button is
-   * held down.
+   * Perform a move, also performing an appropriate action if a button is held
+   * down.
    */
   _move(x, y) {
-    this.setState({
-      x,
-      y,
-      ...this.ctrlDown ? this._etch(x, y) : null,
-      ...!this.ctrlDown && this.shiftDown ? this._mark(x, y) : null,
-    })
+    let coord = `${y}x${x}`
+    let stateChange = {x, y}
+    if (this.ctrlDown || this.shiftDown) {
+      if (this.action === 'clean') {
+        Object.assign(stateChange, this._clean(coord))
+      }
+      else if (this.action === 'etch') {
+        if (!this.state.etched[coord]) {
+          Object.assign(stateChange, this._etch(coord))
+        }
+      }
+      else if (this.action === 'mark') {
+        if (!this.state.marked[coord]) {
+          Object.assign(stateChange, this._mark(coord))
+        }
+      }
+    }
+    this.setState(stateChange)
   },
 
   handleKeyDown(e) {
@@ -213,14 +247,18 @@ let Puzzle = React.createClass({
     }
     else if (e.key === 'Control') {
       if (!this.ctrlDown) {
-        this.setState(this._etch(this.state.x, this.state.y))
+        let {action, ...stateChange} = this._etch(`${this.state.y}x${this.state.x}`)
+        this.setState(stateChange)
+        this.action = action
         this.ctrlDown = true
       }
       e.preventDefault()
     }
     else if (e.key === 'Shift') {
       if (!this.shiftDown) {
-        this.setState(this._mark(this.state.x, this.state.y))
+        let {action, ...stateChange} = this._mark(`${this.state.y}x${this.state.x}`)
+        this.setState(stateChange)
+        this.action = action
         this.shiftDown = true
       }
       e.preventDefault()
@@ -229,14 +267,24 @@ let Puzzle = React.createClass({
   handleKeyUp(e) {
     if (e.key === 'Control') {
       this.ctrlDown = false
+      this.action = null
       e.preventDefault()
     }
     if (e.key === 'Shift') {
       this.shiftDown = false
+      this.action = null
       e.preventDefault()
     }
   },
 
+  getCursorClass() {
+    if (this.action === 'clean') {
+      return 'cleaning'
+    }
+    else if (this.action === 'etch') {
+      return 'etching'
+    }
+  },
   render() {
     let {name} = this.props
     let {completed, failed, etched, marked, time, x, y} = this.state
@@ -277,7 +325,7 @@ let Puzzle = React.createClass({
                   className += ' marked'
                 }
                 if (currentCoord === blockCoord) {
-                  className += ' selected'
+                  className += ' selected ' + this.getCursorClass()
                 }
                 return <td className={className} key={blockCoord}>
                   {marked[blockCoord] ? 'x' : <span>&nbsp;</span>}

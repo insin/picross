@@ -60,5 +60,29 @@ table {
 .marked {
 }
 .selected {
-  outline: 2px solid red;
+  border:  1px solid red;
+  position: relative;
+}
+.selected::before {
+  width: 18px;
+  height: 18px;
+  content: url('./chisel.png');
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  z-index: 10;
+}
+.cleaning::before {
+  content: url('./hand.png');
+  bottom: 2px;
+  left: 2px;
+}
+.etching::after {
+  width: 18px;
+  height: 18px;
+  content: url('./hammer.png');
+  position: absolute;
+  bottom: 32px;
+  left: 48px;
+  z-index: 10;
 }
