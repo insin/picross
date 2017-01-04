@@ -309,7 +309,7 @@ let Puzzle = React.createClass({
             </td>
             {this.colClues.map((clues, col) => {
               let className = 'ColClues'
-              if (x === col) {
+              if (!completed && x === col) {
                 className += ' highlight'
               }
               return <td className={className} key={col}>
@@ -319,7 +319,7 @@ let Puzzle = React.createClass({
           </tr>
           {this.rowClues.map((clues, row) => {
             let clueClassName = 'RowClues'
-            if (y === row) {
+            if (!completed && y === row) {
               clueClassName += ' highlight'
             }
             return <tr className="Row" key={row}>
