@@ -292,12 +292,20 @@ let Puzzle = React.createClass({
     let {name} = this.props
     let {completed, failed, etched, marked, time, x, y} = this.state
     let currentCoord = `${y}x${x}`
-    return <div className="Puzzle" onKeyDown={this.handleKeyDown} onKeyUp={this.handleKeyUp} tabIndex={0}>
+    let className = 'Puzzle'
+    if (completed) {
+      className += ' completed'
+    }
+    return <div className={className} onKeyDown={this.handleKeyDown} onKeyUp={this.handleKeyUp} tabIndex={0}>
       <table>
         <tbody>
           <tr>
             <td style={{textAlign: 'center'}}>
-              {name}<br/>{formatTime(time)}
+              {name}
+              <br/>
+              <span style={{color: time < 120 || failed ? 'red' : 'black'}}>
+                {formatTime(time)}
+              </span>
             </td>
             {this.colClues.map((clues, col) => {
               let className = 'ColClues'
@@ -331,15 +339,13 @@ let Puzzle = React.createClass({
                   className += ' selected ' + this.getCursorClass()
                 }
                 return <td className={className} key={blockCoord}>
-                  {marked[blockCoord] ? 'x' : <span>&nbsp;</span>}
+                  {marked[blockCoord] && !completed ? 'x' : <span>&nbsp;</span>}
                 </td>
               })}
             </tr>
           })}
         </tbody>
       </table>
-      {completed && <h1>Win!</h1>}
-      {failed && <h1>Fail!</h1>}
     </div>
   }
 })

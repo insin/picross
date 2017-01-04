@@ -13,6 +13,7 @@ table {
 .RowClues {
   text-align: right;
   white-space: nowrap;
+  padding-right: 6px;
 }
 .Row:nth-child(2n) .RowClues{
   background-color: lightgray;
@@ -52,10 +53,18 @@ table {
 .Row:nth-of-type(12) .Block {
   border-top: 1px solid black;
 }
+.completed .Block {
+  border-color: transparent !important;
+}
 .etched {
   background-color: gray;
   border-style: inset;
-  border-color: darkslategrey;
+  border-color: gray;
+}
+.completed .etched {
+  background-color: black;
+  border-style: solid;
+  border-color: black !important;
 }
 .marked {
   color: #333;
