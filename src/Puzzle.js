@@ -1,6 +1,7 @@
 import './Puzzle.css'
 
-import React, {PropTypes as t} from 'react'
+import Inferno from 'inferno'
+import createClass from 'inferno-create-class'
 
 export function pad(n) {
   return `${n < 10 ? '0' : ''}${n}`
@@ -61,14 +62,8 @@ export function parsePuzzle(puzzle) {
   return {height: rows.length, width: colCount, colClues, rowClues, solution}
 }
 
-let Puzzle = React.createClass({
-  propTypes: {
-    // The name the puzzle is represented by
-    name: t.string,
-    // An ASCII representation of the puzzle using '-'' for empty squares and 'X'
-    // for filled squares, which may also contain spaces.
-    puzzle: t.string,
-  },
+let Puzzle = createClass({
+  displayName: 'Puzzle',
   getInitialState() {
     return {
       completed: false,

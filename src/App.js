@@ -1,6 +1,7 @@
 import './App.css'
 
-import React from 'react'
+import Inferno from 'inferno'
+import createClass from 'inferno-create-class'
 
 import Puzzle from './Puzzle'
 
@@ -22,7 +23,8 @@ X X - X - - X X X - - X - X X
 - - - - X X - - - X X - - - -
 `
 
-let App = React.createClass({
+let App = createClass({
+  displayName: 'App',
   render() {
     return <div className="App">
       <Puzzle name="TEST-1" puzzle={WEIGHTLIFTER}/>

@@ -1,8 +1,15 @@
 import './index.css'
 
-import React from 'react'
-import {render} from 'react-dom'
+import Inferno from 'inferno'
 
 import App from './App'
 
-render(<App/>, document.querySelector('#app'))
+if (module.hot) {
+  require('inferno-devtools')
+}
+
+Inferno.render(<App/>, document.querySelector('#app'))
+
+if (module.hot) {
+  module.hot.accept()
+}

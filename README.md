@@ -1,4 +1,4 @@
-# [React no Super Picross](https://react-no-super-picross.surge.sh/)
+# [Inferno no Super Picross](https://inferno-no-super-picross.surge.sh/)
 
 [![developed with nwb][nwb-badge]][nwb]
 
